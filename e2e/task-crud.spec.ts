@@ -1,18 +1,5 @@
-import { test, expect, Page } from '@playwright/test';
-
-function uniqueEmail(): string {
-  return `e2e-${Date.now()}-${Math.floor(Math.random() * 100000)}@example.com`;
-}
-
-async function registerAndLogin(page: Page): Promise<void> {
-  await page.goto('/');
-  await page.getByRole('button', { name: 'Register' }).click();
-  await page.getByRole('textbox', { name: 'Email' }).fill(uniqueEmail());
-  await page.getByRole('textbox', { name: 'Password', exact: true }).fill('password123');
-  await page.getByRole('textbox', { name: 'Confirm Password' }).fill('password123');
-  await page.getByRole('button', { name: 'Create Account' }).click();
-  await expect(page.getByRole('button', { name: 'New Task' })).toBeVisible();
-}
+import { test, expect } from '@playwright/test';
+import { registerAndLogin } from './helpers';
 
 test.describe('Task CRUD', () => {
   test('creates, edits, and deletes a task', async ({ page }) => {
@@ -50,7 +37,10 @@ test.describe('Task CRUD', () => {
     await page.getByRole('button', { name: 'Delete task' }).click();
     await page.getByRole('button', { name: 'Cancel' }).click();
 
-    await expect(page.getByText('Task to keep')).toBeVisible();
+    // exact: 'Task to keep' also appears inside the confirm dialog's own
+    // message ("...delete \"Task to keep\"?...") — a substring match on the
+    // undismissed dialog would otherwise resolve to two elements.
+    await expect(page.getByText('Task to keep', { exact: true })).toBeVisible();
   });
 
   test('rejects an empty title', async ({ page }) => {
