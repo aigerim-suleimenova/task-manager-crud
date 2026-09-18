@@ -35,12 +35,16 @@ This auth is intentionally **client-side only** — accounts and password hashes
 - Account registration/login/logout, with each user's tasks stored separately
 - Search, filter (by status/priority), and sort (by title/due date/priority/status)
 - Responsive layout down to mobile width
-- Full test suite (Vitest via `ng test`) covering both services and every component
+- Full unit/component test suite (Vitest via `ng test`) covering both services and every component
+- End-to-end tests (Playwright) driving a real browser against a production build
 
 ## Running tests
 
 ```bash
-ng test          # unit tests
+ng test                                 # unit/component tests (Vitest)
 npx tsc --noEmit -p tsconfig.app.json   # type-check
-ng build          # production build
+ng build                                 # production build
+npm run e2e                             # end-to-end tests (Playwright, run once: npx playwright install --with-deps chromium)
 ```
+
+CI (`.github/workflows/ci.yml`) runs the first three on every push/PR.
