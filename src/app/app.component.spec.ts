@@ -282,7 +282,7 @@ describe('AppComponent', () => {
       expect(fixture.nativeElement.querySelector('app-login')).toBeTruthy();
     });
 
-    it('reveals the task list and the real user’s email in the sidebar after logging in through the real form', async () => {
+    it('reveals the task list and the real user’s email in the header after logging in through the real form', async () => {
       TestBed.inject(AuthService).logout();
 
       const fixture = TestBed.createComponent(AppComponent);
@@ -305,7 +305,7 @@ describe('AppComponent', () => {
       expect(fixture.nativeElement.textContent).toContain(testUser.email);
     });
 
-    it('wires the sidebar logout icon to end the session and return to the login screen', () => {
+    it('wires the header logout icon to end the session and return to the login screen', () => {
       const fixture = TestBed.createComponent(AppComponent);
       fixture.detectChanges();
 
