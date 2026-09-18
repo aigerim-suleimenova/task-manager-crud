@@ -1,117 +1,81 @@
 @if (authService.isAuthenticated()) {
-<div class="d-flex min-vh-100 bg-body-tertiary">
-  <aside class="sidebar d-none d-md-flex flex-column gap-4 p-3 border-end bg-body-tertiary flex-shrink-0">
-    <div class="d-flex align-items-center gap-2 p-2 rounded-3">
+<div class="d-flex flex-column min-vh-100 bg-body-tertiary">
+  <header
+    class="d-flex flex-wrap gap-3 justify-content-between align-items-center px-3 px-md-4 py-3 border-bottom bg-white"
+  >
+    <div class="d-flex align-items-center gap-3">
       <div
-        class="logo-badge rounded-3 d-flex align-items-center justify-content-center fw-bold text-white"
+        class="logo-badge rounded-3 d-flex align-items-center justify-content-center fw-bold text-white flex-shrink-0"
         aria-hidden="true"
       >
         T
       </div>
-      <div class="flex-grow-1 min-w-0">
-        <div class="fw-semibold small text-truncate">Acme Corp</div>
-        <div class="text-muted workspace-label">Workspace</div>
-      </div>
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" class="workspace-chevron">
-        <path d="M4 6L8 10L12 6" stroke-width="2" stroke-linecap="round" />
-      </svg>
+      <h1 class="h5 fw-bold mb-0">Task Manager</h1>
+      <span class="badge bg-light text-secondary rounded-pill fw-semibold">{{ taskCount() }} active</span>
     </div>
-
-    <nav class="d-flex flex-column gap-1">
-      <!-- Only section in the app today, so this is a status indicator, not a
-           navigable link — no href/click, just aria-current for screen readers. -->
-      <span
-        aria-current="page"
-        class="nav-link-active d-flex align-items-center gap-2 rounded-3 px-2 py-2 fw-semibold"
-      >
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+    <div class="d-flex align-items-center gap-3">
+      <div class="search-box d-none d-lg-flex align-items-center gap-2 rounded-3">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true" class="search-icon">
           <path
-            d="M15.75 7.992V14.25C15.75 14.6478 15.592 15.0294 15.3107 15.3107C15.0294 15.592 14.6478 15.75 14.25 15.75H3.75C3.35218 15.75 2.97064 15.592 2.68934 15.3107C2.40804 15.0294 2.25 14.6478 2.25 14.25V3.75C2.25 3.35218 2.40804 2.97064 2.68934 2.68934C2.97064 2.40804 3.35218 2.25 3.75 2.25H13.008M6.75 8.25L9 10.5L16.5 3"
+            d="M12.2501 12.2501L9.71843 9.71843M11.0833 6.41667C11.0833 8.994 8.994 11.0833 6.41667 11.0833C3.83934 11.0833 1.75 8.994 1.75 6.41667C1.75 3.83934 3.83934 1.75 6.41667 1.75C8.994 1.75 11.0833 3.83934 11.0833 6.41667Z"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+        </svg>
+        <input
+          type="text"
+          class="search-input flex-grow-1"
+          placeholder="Search tasks..."
+          aria-label="Search tasks"
+          [value]="searchTerm()"
+          (input)="onSearchInput($event)"
+        />
+      </div>
+      <button
+        type="button"
+        class="btn btn-primary d-flex align-items-center gap-2"
+        (click)="openCreate()"
+      >
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          <path
+            d="M2.91602 7H11.0836M6.99982 2.9162V11.0838"
             stroke="currentColor"
             stroke-width="2"
             stroke-linecap="round"
           />
         </svg>
-        Tasks
-      </span>
-    </nav>
-
-    <div class="flex-grow-1"></div>
-
-    <div class="d-flex align-items-center gap-2 pt-3 border-top">
-      <div
-        class="avatar rounded-circle d-flex align-items-center justify-content-center fw-semibold text-white flex-shrink-0"
-        aria-hidden="true"
-      >
-        {{ userInitials() }}
-      </div>
-      <div class="flex-grow-1 min-w-0">
-        <div class="fw-semibold small text-truncate">{{ authService.currentUser()?.email }}</div>
-      </div>
-      <button
-        type="button"
-        class="icon-btn"
-        aria-label="Log out"
-        (click)="onLogout()"
-      >
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-          <path
-            d="M10.6667 4.66667L14 8L10.6667 11.3333M14 8H6M6 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V3.33333C2 2.97971 2.14048 2.64057 2.39052 2.39052C2.64057 2.14048 2.97971 2 3.33333 2H6"
-            stroke-width="2"
-            stroke-linecap="round"
-          />
-        </svg>
+        New Task
       </button>
-    </div>
-  </aside>
-
-  <main class="flex-grow-1 d-flex flex-column min-w-0">
-    <header
-      class="d-flex flex-wrap gap-3 justify-content-between align-items-center px-3 px-md-4 py-3 border-bottom bg-white min-w-0"
-    >
-      <div class="d-flex align-items-center gap-3">
-        <h1 class="h5 fw-bold mb-0">Task Manager</h1>
-        <span class="badge bg-light text-secondary rounded-pill fw-semibold">{{ taskCount() }} active</span>
-      </div>
-      <div class="d-flex align-items-center gap-3">
-        <div class="search-box d-none d-lg-flex align-items-center gap-2 rounded-3">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true" class="search-icon">
-            <path
-              d="M12.2501 12.2501L9.71843 9.71843M11.0833 6.41667C11.0833 8.994 8.994 11.0833 6.41667 11.0833C3.83934 11.0833 1.75 8.994 1.75 6.41667C1.75 3.83934 3.83934 1.75 6.41667 1.75C8.994 1.75 11.0833 3.83934 11.0833 6.41667Z"
-              stroke-width="2"
-              stroke-linecap="round"
-            />
-          </svg>
-          <input
-            type="text"
-            class="search-input flex-grow-1"
-            placeholder="Search tasks..."
-            aria-label="Search tasks"
-            [value]="searchTerm()"
-            (input)="onSearchInput($event)"
-          />
+      <div class="d-flex align-items-center gap-2 ps-3 border-start">
+        <div
+          class="avatar rounded-circle d-flex align-items-center justify-content-center fw-semibold text-white flex-shrink-0"
+          aria-hidden="true"
+        >
+          {{ userInitials() }}
         </div>
+        <span class="user-email d-none d-sm-inline-block text-truncate small text-muted align-middle">
+          {{ authService.currentUser()?.email }}
+        </span>
         <button
           type="button"
-          class="btn btn-primary d-flex align-items-center gap-2"
-          (click)="openCreate()"
+          class="icon-btn"
+          aria-label="Log out"
+          (click)="onLogout()"
         >
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
             <path
-              d="M2.91602 7H11.0836M6.99982 2.9162V11.0838"
-              stroke="currentColor"
+              d="M10.6667 4.66667L14 8L10.6667 11.3333M14 8H6M6 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V3.33333C2 2.97971 2.14048 2.64057 2.39052 2.39052C2.64057 2.14048 2.97971 2 3.33333 2H6"
               stroke-width="2"
               stroke-linecap="round"
             />
           </svg>
-          New Task
         </button>
       </div>
-    </header>
-
-    <div class="p-3 p-md-4 flex-grow-1">
-      <app-task-list [searchTerm]="searchTerm()" (edit)="openEdit($event)" (delete)="openDeleteConfirm($event)" />
     </div>
+  </header>
+
+  <main class="p-3 p-md-4 flex-grow-1">
+    <app-task-list [searchTerm]="searchTerm()" (edit)="openEdit($event)" (delete)="openDeleteConfirm($event)" />
   </main>
 </div>
 
