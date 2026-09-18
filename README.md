@@ -1,5 +1,7 @@
 # Task Manager
 
+**Live demo:** https://aigerim-suleimenova.github.io/task-manager-crud/
+
 A CRUD task manager built with Angular (standalone components, Signals, Reactive Forms) and Bootstrap 5, persisted entirely to `localStorage` — no backend.
 
 > **Note to the reviewer:** For this CRUD task, I chose Angular and TypeScript and focused on building a clean, maintainable, component-based application. Beyond the core CRUD requirements, I implemented login and authorization to go above and beyond, and to demonstrate that I can deliver quickly and learn fast.
