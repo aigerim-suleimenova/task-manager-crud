@@ -1,5 +1,16 @@
-import { Component, ElementRef, HostListener, computed, inject, input, output, signal } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  HostListener,
+  computed,
+  effect,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import { TaskService } from '../../../../core/services/task.service';
+import { AuthService } from '../../../../core/services/auth.service';
 import { Task, TaskPriority, TaskStatus } from '../../../../core/models/task.model';
 import { formatDueDate } from '../../../../shared/date-format';
 import { BadgeComponent } from '../../../../shared/components/badge/badge.component';
@@ -30,6 +41,59 @@ const SORT_FIELDS: { value: SortField; label: string }[] = [
   { value: 'status', label: 'Status' },
 ];
 
+const STATUS_VALUES: readonly TaskStatus[] = ['To Do', 'In Progress', 'Done'];
+const PRIORITY_VALUES: readonly TaskPriority[] = ['Low', 'Medium', 'High'];
+const SORT_FIELD_VALUES: readonly SortField[] = ['title', 'dueDate', 'priority', 'status'];
+
+interface StoredViewPrefs {
+  statusFilter: TaskStatus[];
+  priorityFilter: TaskPriority[];
+  sortField: SortField | null;
+  sortDirection: SortDirection;
+}
+
+interface ViewPrefs {
+  statusFilter: ReadonlySet<TaskStatus>;
+  priorityFilter: ReadonlySet<TaskPriority>;
+  sortField: SortField | null;
+  sortDirection: SortDirection;
+}
+
+function viewPrefsKeyFor(userId: string): string {
+  return `task_view_prefs_${userId}`;
+}
+
+const DEFAULT_VIEW_PREFS: ViewPrefs = {
+  statusFilter: new Set(),
+  priorityFilter: new Set(),
+  sortField: null,
+  sortDirection: 'asc',
+};
+
+function loadViewPrefs(userId: string | undefined): ViewPrefs {
+  if (!userId) {
+    return DEFAULT_VIEW_PREFS;
+  }
+  try {
+    const raw = localStorage.getItem(viewPrefsKeyFor(userId));
+    if (!raw) {
+      return DEFAULT_VIEW_PREFS;
+    }
+    const parsed = JSON.parse(raw);
+    const statusFilter = Array.isArray(parsed.statusFilter)
+      ? parsed.statusFilter.filter((s: unknown) => STATUS_VALUES.includes(s as TaskStatus))
+      : [];
+    const priorityFilter = Array.isArray(parsed.priorityFilter)
+      ? parsed.priorityFilter.filter((p: unknown) => PRIORITY_VALUES.includes(p as TaskPriority))
+      : [];
+    const sortField = SORT_FIELD_VALUES.includes(parsed.sortField) ? (parsed.sortField as SortField) : null;
+    const sortDirection: SortDirection = parsed.sortDirection === 'desc' ? 'desc' : 'asc';
+    return { statusFilter: new Set(statusFilter), priorityFilter: new Set(priorityFilter), sortField, sortDirection };
+  } catch {
+    return DEFAULT_VIEW_PREFS;
+  }
+}
+
 function compareTasks(a: Task, b: Task, field: SortField): number {
   switch (field) {
     case 'title':
@@ -54,6 +118,7 @@ function compareTasks(a: Task, b: Task, field: SortField): number {
 })
 export class TaskListComponent {
   private readonly taskService = inject(TaskService);
+  private readonly authService = inject(AuthService);
   private readonly elementRef = inject(ElementRef<HTMLElement>);
 
   readonly searchTerm = input('');
@@ -72,6 +137,59 @@ export class TaskListComponent {
   readonly activeFilterCount = computed(() => this.statusFilter().size + this.priorityFilter().size);
 
   readonly openMenu = signal<OpenMenu>(null);
+
+  // Tracks which user's prefs are currently loaded into the signals above,
+  // so the effect below can tell "the user changed" apart from "the same
+  // user changed a filter" on each run.
+  private lastLoadedUserId: string | undefined;
+
+  constructor() {
+    // Single effect, explicitly ordered: two separate effects (one to load
+    // on user change, one to persist on filter/sort change) would both
+    // depend on the same userId signal with no guaranteed execution order
+    // between them — if the persist effect ran first on a user switch, it
+    // would write the previous user's in-memory filter state under the new
+    // user's storage key. Branching within one effect avoids that by
+    // construction.
+    effect(() => {
+      const userId = this.authService.currentUser()?.id;
+      // Read unconditionally, not only inside the branch below that needs
+      // them: on the very first run, lastLoadedUserId is undefined, so the
+      // "user changed" branch always runs first and never reaches the read
+      // below it. If these were read only there, this effect would never
+      // establish them as dependencies at all, and would never re-run when
+      // a filter/sort actually changes afterward — persistence would
+      // silently stop working after the initial load. Reading them here
+      // does mean the "user changed" branch's own .set() calls trigger one
+      // harmless extra run (re-persisting the same just-loaded values); that
+      // redundancy is the correct, deliberate trade-off, not a bug.
+      const statusFilter = this.statusFilter();
+      const priorityFilter = this.priorityFilter();
+      const sortField = this.sortField();
+      const sortDirection = this.sortDirection();
+
+      if (userId !== this.lastLoadedUserId) {
+        this.lastLoadedUserId = userId;
+        const prefs = loadViewPrefs(userId);
+        this.statusFilter.set(prefs.statusFilter);
+        this.priorityFilter.set(prefs.priorityFilter);
+        this.sortField.set(prefs.sortField);
+        this.sortDirection.set(prefs.sortDirection);
+        return;
+      }
+
+      if (!userId) {
+        return;
+      }
+      const prefs: StoredViewPrefs = {
+        statusFilter: Array.from(statusFilter),
+        priorityFilter: Array.from(priorityFilter),
+        sortField,
+        sortDirection,
+      };
+      localStorage.setItem(viewPrefsKeyFor(userId), JSON.stringify(prefs));
+    });
+  }
 
   readonly tasks = computed(() => {
     let result = this.taskService.tasks();

@@ -3,6 +3,7 @@ import { TaskListComponent } from './task-list.component';
 import { TaskService } from '../../../../core/services/task.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { Task } from '../../../../core/models/task.model';
+import { UserAccount } from '../../../../core/models/user-account.model';
 import { registerTestUser } from '../../../../testing/auth-test-helpers';
 
 function getToggleButton(
@@ -51,10 +52,12 @@ function createTask(taskService: TaskService, overrides: Partial<Omit<Task, 'id'
 }
 
 describe('TaskListComponent', () => {
+  let testUser: UserAccount;
+
   beforeEach(async () => {
     localStorage.clear();
     TestBed.configureTestingModule({ imports: [TaskListComponent] });
-    await registerTestUser(TestBed.inject(AuthService));
+    testUser = await registerTestUser(TestBed.inject(AuthService));
   });
 
   it('renders an empty state when there are no tasks', () => {
@@ -354,6 +357,68 @@ describe('TaskListComponent', () => {
       fixture.detectChanges();
 
       expect(getRowTitles(fixture)).toEqual([first.title, second.title]);
+    });
+  });
+
+  describe('view preference persistence', () => {
+    it('restores filter and sort state from a previous session', () => {
+      const taskService = TestBed.inject(TaskService);
+      createTask(taskService, { title: 'A', status: 'To Do', priority: 'High' });
+      createTask(taskService, { title: 'B', status: 'Done', priority: 'Low' });
+
+      let fixture = TestBed.createComponent(TaskListComponent);
+      fixture.detectChanges();
+      getToggleButton(fixture, 'Filters').click();
+      fixture.detectChanges();
+      getFilterCheckbox(fixture, 'To Do').click();
+      fixture.detectChanges();
+      getToggleButton(fixture, 'Sort').click();
+      fixture.detectChanges();
+      (
+        Array.from(fixture.nativeElement.querySelectorAll('[role="menuitemradio"]')).find((b) =>
+          (b as HTMLButtonElement).textContent?.includes('Title'),
+        ) as HTMLButtonElement
+      ).click();
+      fixture.detectChanges();
+      expect(getRowTitles(fixture)).toEqual(['A']);
+
+      // Simulate a page reload: a fresh component instance reading the same localStorage.
+      fixture = TestBed.createComponent(TaskListComponent);
+      fixture.detectChanges();
+
+      expect(fixture.componentInstance.activeFilterCount()).toBe(1);
+      expect(fixture.componentInstance.activeSortField()).toBe('title');
+      expect(getRowTitles(fixture)).toEqual(['A']);
+    });
+
+    it('does not leak one user’s view preferences into another user’s session', async () => {
+      const taskService = TestBed.inject(TaskService);
+      createTask(taskService, { title: 'Shared-name task', status: 'To Do' });
+
+      const fixture = TestBed.createComponent(TaskListComponent);
+      fixture.detectChanges();
+      getToggleButton(fixture, 'Filters').click();
+      fixture.detectChanges();
+      getFilterCheckbox(fixture, 'To Do').click();
+      fixture.detectChanges();
+      expect(fixture.componentInstance.activeFilterCount()).toBe(1);
+
+      const authService = TestBed.inject(AuthService);
+      authService.logout();
+      await registerTestUser(authService, 'second-user@example.com');
+      fixture.detectChanges();
+
+      expect(fixture.componentInstance.activeFilterCount()).toBe(0);
+    });
+
+    it('falls back to defaults when the stored preferences are corrupt JSON', () => {
+      localStorage.setItem(`task_view_prefs_${testUser.id}`, '{not valid json');
+
+      const fixture = TestBed.createComponent(TaskListComponent);
+      fixture.detectChanges();
+
+      expect(fixture.componentInstance.activeFilterCount()).toBe(0);
+      expect(fixture.componentInstance.activeSortField()).toBeNull();
     });
   });
 
