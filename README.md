@@ -47,4 +47,4 @@ ng build                                 # production build
 npm run e2e                             # end-to-end tests (Playwright, run once: npx playwright install --with-deps chromium)
 ```
 
-CI (`.github/workflows/ci.yml`) runs the first three on every push/PR.
+CI (`.github/workflows/ci.yml`) runs all four on every push/PR: type-check, unit tests, and build in one job, e2e in a separate job.
