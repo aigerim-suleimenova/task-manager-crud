@@ -45,3 +45,7 @@ Thumbs.db
 
 # Playwright MCP debug artifacts
 .playwright-mcp/
+
+# AI tooling/planning artifacts — not part of the app itself
+/.claude/
+/openspec/
