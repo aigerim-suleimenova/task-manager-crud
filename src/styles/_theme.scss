@@ -1,0 +1,89 @@
+// Status and priority badge colors, pinned to the exact hex values from the
+// Figma export (see design.md — Bootstrap's default badge palette doesn't match).
+
+:root {
+  --brand-primary: #7ab648;
+
+  --status-todo-bg: #f3f4f6;
+  --status-todo-fg: #4b5563;
+  --status-in-progress-bg: #e8f5de;
+  --status-in-progress-fg: #5a8a35;
+  --status-done-bg: #d1fae5;
+  --status-done-fg: #065f46;
+
+  --priority-low-bg: #f0fdf4;
+  --priority-low-fg: #15803d;
+  --priority-medium-bg: #fef3c7;
+  --priority-medium-fg: #d97706;
+  --priority-high-bg: #fee2e2;
+  --priority-high-fg: #dc2626;
+}
+
+.badge-status-todo {
+  background-color: var(--status-todo-bg);
+  color: var(--status-todo-fg);
+}
+
+.badge-status-in-progress {
+  background-color: var(--status-in-progress-bg);
+  color: var(--status-in-progress-fg);
+}
+
+.badge-status-done {
+  background-color: var(--status-done-bg);
+  color: var(--status-done-fg);
+}
+
+.badge-priority-low {
+  background-color: var(--priority-low-bg);
+  color: var(--priority-low-fg);
+}
+
+.badge-priority-medium {
+  background-color: var(--priority-medium-bg);
+  color: var(--priority-medium-fg);
+}
+
+.badge-priority-high {
+  background-color: var(--priority-high-bg);
+  color: var(--priority-high-fg);
+}
+
+// Shared icon-only button: transparent, square, with a stroked SVG icon that
+// darkens on hover. Add .icon-btn-danger alongside it for actions (e.g.
+// Delete) whose hover state should read as destructive instead of neutral.
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease-in-out;
+
+  &:hover {
+    background-color: #f3f4f6;
+  }
+
+  svg path {
+    stroke: #6b7280;
+    transition: stroke 0.15s ease-in-out;
+  }
+
+  &:hover svg path {
+    stroke: #1f2937;
+  }
+}
+
+.icon-btn-danger {
+  svg path {
+    stroke: #9ca3af;
+  }
+
+  &:hover svg path {
+    stroke: #dc2626;
+  }
+}

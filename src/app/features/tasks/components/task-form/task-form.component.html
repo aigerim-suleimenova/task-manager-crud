@@ -1,0 +1,76 @@
+<app-modal ariaLabelledby="task-form-title" (close)="cancel.emit()">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="modal-header border-0 pb-0">
+      <h5 id="task-form-title" class="modal-title fw-bold">{{ isEdit ? 'Edit Task' : 'New Task' }}</h5>
+      <button type="button" class="btn-close" aria-label="Close" (click)="cancel.emit()"></button>
+    </div>
+
+    <div class="modal-body d-flex flex-column gap-3">
+      <div>
+        <label class="form-label fw-semibold small" for="task-title">
+          Title <span class="text-danger" aria-hidden="true">*</span>
+        </label>
+        <input
+          id="task-title"
+          type="text"
+          class="form-control"
+          formControlName="title"
+          aria-required="true"
+          [class.is-invalid]="titleInvalid"
+          [attr.aria-invalid]="titleInvalid ? true : null"
+          [attr.aria-describedby]="titleInvalid ? 'task-title-error' : null"
+        />
+        @if (titleInvalid) {
+          <div id="task-title-error" class="invalid-feedback d-block" role="alert">Title is required.</div>
+        }
+      </div>
+
+      <div>
+        <label class="form-label fw-semibold small" for="task-description">Description</label>
+        <textarea
+          id="task-description"
+          class="form-control"
+          rows="3"
+          formControlName="description"
+        ></textarea>
+      </div>
+
+      <div>
+        <label class="form-label fw-semibold small" for="task-status">Status</label>
+        <select id="task-status" class="form-select" formControlName="status">
+          @for (option of statusOptions; track option) {
+            <option [value]="option">{{ option }}</option>
+          }
+        </select>
+      </div>
+
+      <fieldset class="border-0 p-0 m-0">
+        <legend class="form-label fw-semibold small d-block mb-1">Priority</legend>
+        <div class="d-flex gap-3">
+          @for (option of priorityOptions; track option) {
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                [id]="'priority-' + option"
+                [value]="option"
+                formControlName="priority"
+              />
+              <label class="form-check-label" [for]="'priority-' + option">{{ option }}</label>
+            </div>
+          }
+        </div>
+      </fieldset>
+
+      <div>
+        <label class="form-label fw-semibold small" for="task-due-date">Due Date</label>
+        <input id="task-due-date" type="date" class="form-control" formControlName="dueDate" />
+      </div>
+    </div>
+
+    <div class="modal-footer border-0 pt-0">
+      <button type="button" class="btn btn-outline-secondary" (click)="cancel.emit()">Cancel</button>
+      <button type="submit" class="btn btn-primary">{{ isEdit ? 'Save Changes' : 'Create Task' }}</button>
+    </div>
+  </form>
+</app-modal>

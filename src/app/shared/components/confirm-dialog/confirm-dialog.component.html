@@ -1,0 +1,30 @@
+<app-modal ariaLabelledby="confirm-dialog-title" ariaDescribedby="confirm-dialog-message" (close)="cancel.emit()">
+  <div class="modal-body">
+    <div class="d-flex align-items-start gap-3 mb-3">
+      <div
+        class="warn-icon-bg rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+        aria-hidden="true"
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path
+            d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4M12 17h.01"
+            stroke="#dc2626"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </div>
+      <h5 id="confirm-dialog-title" class="fw-bold mb-0 mt-1">{{ title }}</h5>
+    </div>
+    <p id="confirm-dialog-message" class="text-muted mb-0">{{ message }}</p>
+  </div>
+  <div class="modal-footer border-0 pt-0">
+    <button type="button" class="btn btn-outline-secondary flex-fill" (click)="cancel.emit()">
+      {{ cancelLabel }}
+    </button>
+    <button type="button" class="btn btn-danger flex-fill" (click)="confirm.emit()">
+      {{ confirmLabel }}
+    </button>
+  </div>
+</app-modal>

@@ -1,0 +1,62 @@
+// Bootstrap 5 ships min-vh-*/min-vw-* but no min-width utility at all, so
+// .min-w-0 (used to let flex children shrink below their content's natural
+// width instead of overflowing) isn't a real Bootstrap class — define it here.
+.min-w-0 {
+  min-width: 0;
+}
+
+.sidebar {
+  width: 240px;
+}
+
+.logo-badge {
+  width: 32px;
+  height: 32px;
+  background-color: var(--brand-primary);
+}
+
+.nav-link-active {
+  background-color: #edf7e4;
+  color: var(--brand-primary);
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  background-color: #3b82f6;
+}
+
+.workspace-label {
+  font-size: 0.6875rem;
+}
+
+.workspace-chevron path {
+  stroke: #6b7280;
+}
+
+.search-box {
+  width: 240px;
+  height: 36px;
+  padding: 0 12px;
+  background-color: #f3f4f6;
+  flex-shrink: 0;
+}
+
+.search-input {
+  border: 0;
+  background: transparent;
+  font-size: 0.8125rem;
+  color: #111827;
+  min-width: 0;
+
+  &::placeholder {
+    color: #9ca3af;
+  }
+
+  // Intentionally no custom :focus style here — keep the browser's default
+  // visible focus indicator (WCAG 2.4.7) rather than suppressing it.
+}
+
+.search-icon path {
+  stroke: #9ca3af;
+}

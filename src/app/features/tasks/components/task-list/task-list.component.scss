@@ -1,0 +1,205 @@
+.col-status,
+.col-priority,
+.col-due-date {
+  width: 130px;
+}
+
+.col-actions {
+  width: 90px;
+}
+
+.task-description {
+  max-width: 360px;
+}
+
+// Below the sidebar's md breakpoint there's no room left for a 5-column
+// table (even with horizontal scroll, Status/Priority/Due Date/Actions end
+// up permanently off-screen). Below that width, render the table as a
+// stack of cards instead: one per task, each cell's value labelled via its
+// own data-label attribute in place of the (now-hidden) column headers.
+@media (max-width: 767.98px) {
+  .task-table thead {
+    display: none;
+  }
+
+  .task-table,
+  .task-table tbody,
+  .task-table tr {
+    display: block;
+    width: 100%;
+  }
+
+  .task-table tr {
+    border-bottom: 1px solid #f3f4f6;
+    padding: 12px 16px;
+  }
+
+  .task-table td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 0;
+    padding: 4px 0;
+  }
+
+  .task-table td::before {
+    content: attr(data-label);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: #9ca3af;
+  }
+
+  // The title/description cell reads as a block, not a labelled key/value row.
+  .task-table td:first-child {
+    display: block;
+    padding-bottom: 8px;
+  }
+
+  .task-table td:first-child::before {
+    content: none;
+  }
+
+  // The actions cell has no label; its buttons sit flush right.
+  .task-table td:last-child {
+    justify-content: flex-end;
+    gap: 4px;
+    padding-top: 8px;
+  }
+}
+
+.filter-tab {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #4b5563;
+}
+
+.filter-tab-active {
+  background-color: #f3f4f6;
+  color: #111827;
+  font-weight: 600;
+}
+
+/* Custom chrome and icon button styles */
+.chrome-btn {
+  background-color: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #4b5563;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.chrome-btn:hover {
+  background-color: #f3f4f6;
+}
+
+.chrome-btn svg path {
+  stroke: #4b5563;
+  transition: stroke 0.15s ease-in-out;
+}
+
+.chrome-btn:hover svg path {
+  stroke: #1f2937;
+}
+
+.due-date-icon path {
+  stroke: #9ca3af;
+}
+
+/* Filters/Sort dropdown panels */
+.dropdown-wrapper {
+  position: relative;
+}
+
+.dropdown-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 20;
+  min-width: 190px;
+  background-color: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 12px 24px 0 rgba(0, 0, 0, 0.08);
+  padding: 8px;
+}
+
+.dropdown-item {
+  display: flex;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  color: #374151;
+  text-align: left;
+
+  &:hover {
+    background-color: #f3f4f6;
+  }
+
+  &[aria-checked='true'] {
+    color: var(--brand-primary);
+    font-weight: 600;
+  }
+}
+
+.filters-section {
+  padding: 4px 6px;
+}
+
+.filters-section + .filters-section {
+  border-top: 1px solid #f3f4f6;
+  margin-top: 4px;
+  padding-top: 8px;
+}
+
+.filters-section-title {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: #9ca3af;
+  margin-bottom: 4px;
+}
+
+.filters-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: #374151;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #f3f4f6;
+  }
+}
+
+.filter-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background-color: var(--brand-primary);
+  // Dark text, not white: white-on-#7ab648 fails WCAG contrast at this size
+  // (~2.4:1); black gives ~8.6:1. Same reasoning as the primary button text.
+  color: #000;
+  font-size: 0.625rem;
+  font-weight: 700;
+}

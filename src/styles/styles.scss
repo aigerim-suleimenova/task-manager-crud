@@ -1,0 +1,7 @@
+// Main SCSS entry point: imports Bootstrap modules with our overrides applied
+// before the framework's own variables are defined.
+@use 'variables';
+@use 'bootstrap/scss/bootstrap' with (
+  $primary: variables.$primary
+);
+@use 'theme';

@@ -1,0 +1,68 @@
+<main class="auth-page d-flex align-items-center justify-content-center min-vh-100 px-3">
+  <div class="auth-card card border rounded-4 p-4 p-md-5">
+    <div class="text-center mb-4">
+      <div
+        class="brand-badge rounded-3 d-flex align-items-center justify-content-center fw-bold text-white mx-auto mb-3"
+        aria-hidden="true"
+      >
+        T
+      </div>
+      <h1 class="h4 fw-bold mb-1">Create your account</h1>
+      <p class="text-muted small mb-0">Get started with Task Manager</p>
+      <p class="text-muted small mb-0">Any email works — no verification step.</p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      @if (errorMessage()) {
+        <div class="alert alert-danger py-2 small" role="alert">{{ errorMessage() }}</div>
+      }
+
+      <div class="mb-3">
+        <label class="form-label fw-semibold small" for="register-email">Email</label>
+        <input
+          id="register-email"
+          type="email"
+          class="form-control"
+          formControlName="email"
+          autocomplete="username"
+          required
+        />
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fw-semibold small" for="register-password">Password</label>
+        <input
+          id="register-password"
+          type="password"
+          class="form-control"
+          formControlName="password"
+          autocomplete="new-password"
+          aria-describedby="register-password-hint"
+          required
+        />
+        <div id="register-password-hint" class="form-text">At least 8 characters.</div>
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label fw-semibold small" for="register-confirm-password">Confirm Password</label>
+        <input
+          id="register-confirm-password"
+          type="password"
+          class="form-control"
+          formControlName="confirmPassword"
+          autocomplete="new-password"
+          required
+        />
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100" [disabled]="submitting()">Create Account</button>
+    </form>
+
+    <p class="text-center small text-muted mt-4 mb-0">
+      Already have an account?
+      <button type="button" class="btn btn-link p-0 align-baseline" (click)="switchToLogin.emit()">
+        Log in
+      </button>
+    </p>
+  </div>
+</main>
