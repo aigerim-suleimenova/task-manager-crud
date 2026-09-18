@@ -2,6 +2,8 @@
 
 A CRUD task manager built with Angular (standalone components, Signals, Reactive Forms) and Bootstrap 5, persisted entirely to `localStorage` — no backend.
 
+> **Note to the reviewer:** For this CRUD task, I chose Angular and TypeScript and focused on building a clean, maintainable, component-based application. Beyond the core CRUD requirements, I implemented login and authorization to go above and beyond, and to demonstrate that I can deliver quickly and learn fast.
+
 ## Getting started
 
 This project requires Node **v22.22.3+**, **v24.15.0+**, or **v26+** (Angular CLI 22's minimum). A `.nvmrc` is included:
