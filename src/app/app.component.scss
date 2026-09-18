@@ -1,23 +1,7 @@
-// Bootstrap 5 ships min-vh-*/min-vw-* but no min-width utility at all, so
-// .min-w-0 (used to let flex children shrink below their content's natural
-// width instead of overflowing) isn't a real Bootstrap class — define it here.
-.min-w-0 {
-  min-width: 0;
-}
-
-.sidebar {
-  width: 240px;
-}
-
 .logo-badge {
   width: 32px;
   height: 32px;
   background-color: var(--brand-primary);
-}
-
-.nav-link-active {
-  background-color: #edf7e4;
-  color: var(--brand-primary);
 }
 
 .avatar {
@@ -26,12 +10,8 @@
   background-color: #3b82f6;
 }
 
-.workspace-label {
-  font-size: 0.6875rem;
-}
-
-.workspace-chevron path {
-  stroke: #6b7280;
+.user-email {
+  max-width: 160px;
 }
 
 .search-box {
