@@ -42,6 +42,17 @@ This auth is intentionally **client-side only** — accounts and password hashes
 - Full unit/component test suite (Vitest via `ng test`) covering both services and every component
 - End-to-end tests (Playwright) driving a real browser against a production build
 
+## Architecture & decisions
+
+**Stack:** Angular 22 (standalone components, no NgModules), Signals for state, Reactive Forms, Bootstrap 5 for layout/styling, TypeScript, Vitest for unit/component tests, Playwright for e2e. RxJS is a transitive Angular dependency but isn't used for app state — Signals cover it.
+
+- **No Angular Router.** The app has exactly two screens (auth, task list) plus modals, so `AppComponent` gates what renders with a signal-backed discriminated union (`ModalState`, `AuthView`) instead of route config. This also sidesteps the usual GitHub Pages SPA-routing workaround (404.html redirect trick / hash routing) — see the comment in `deploy-pages.yml`. If the app grew more top-level views, this would be the first thing to swap for the Router.
+- **Signals over NgRx/a state library.** `AuthService` and `TaskService` (`src/app/core/services/`) hold state in signals and expose `computed()` derivations (`currentUser`, `isAuthenticated`, `tasks`). At this scale a store adds indirection without paying for itself; the services are the single source of truth and are still easily unit-testable.
+- **Feature-based folder structure:** `core/` (services, models — no UI), `features/auth` and `features/tasks` (screen-specific components), `shared/` (reusable UI components and pure helper functions like `date-format.ts`, `user-initials.ts`). Keeps ownership of a concept in one place rather than splitting by file type.
+- **Persistence is `localStorage`, namespaced per user.** Tasks are stored under `tasks_data_<userId>`, filter/sort view preferences under `task_view_prefs_<userId>`, accounts/session under fixed keys. `TaskService` re-reads from storage via an `effect()` whenever the logged-in user changes, so switching accounts can't leak one user's tasks into another's view.
+- **Auth is deliberately client-side only.** Passwords are SHA-256-hashed (unsalted) before being written to `localStorage` (`shared/password-hash.ts`) purely so a devtools glance doesn't show plaintext — it is explicitly *not* a real security boundary, since anyone with access to read that hash already has access to everything it would protect. This was a scope call: the assignment allows "no backend," and a real auth boundary requires a backend to enforce it.
+- **CI/CD is two GitHub Actions workflows:** `ci.yml` runs type-check, unit tests, and build on every push/PR, plus a separate e2e job (Playwright against a real build); `deploy-pages.yml` builds with `--base-href /task-manager-crud/` and publishes to GitHub Pages on push to `main`.
+
 ## Running tests
 
 ```bash
