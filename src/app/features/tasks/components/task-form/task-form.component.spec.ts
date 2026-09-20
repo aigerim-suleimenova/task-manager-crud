@@ -32,7 +32,7 @@ describe('TaskFormComponent', () => {
     };
 
     const fixture = TestBed.createComponent(TaskFormComponent);
-    fixture.componentInstance.task = task;
+    fixture.componentRef.setInput('task', task);
     fixture.detectChanges();
 
     expect(fixture.componentInstance.form.getRawValue()).toEqual({
