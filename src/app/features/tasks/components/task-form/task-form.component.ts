@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, inject, output, signal } from '@angular/core';
+import { Component, effect, inject, input, output, signal } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -20,8 +20,8 @@ function requiredTrimmedValidator(control: AbstractControl): ValidationErrors | 
   templateUrl: './task-form.component.html',
   styleUrl: './task-form.component.scss',
 })
-export class TaskFormComponent implements OnInit {
-  @Input() task: Task | null = null;
+export class TaskFormComponent {
+  readonly task = input<Task | null>(null);
 
   readonly save = output<TaskFormValue>();
   readonly cancel = output<void>();
@@ -42,20 +42,23 @@ export class TaskFormComponent implements OnInit {
     dueDate: this.fb.control<string | null>(null),
   });
 
-  ngOnInit(): void {
-    if (this.task) {
-      this.form.patchValue({
-        title: this.task.title,
-        description: this.task.description,
-        status: this.task.status,
-        priority: this.task.priority,
-        dueDate: this.task.dueDate,
-      });
-    }
+  constructor() {
+    effect(() => {
+      const task = this.task();
+      if (task) {
+        this.form.patchValue({
+          title: task.title,
+          description: task.description,
+          status: task.status,
+          priority: task.priority,
+          dueDate: task.dueDate,
+        });
+      }
+    });
   }
 
   get isEdit(): boolean {
-    return !!this.task;
+    return !!this.task();
   }
 
   get titleInvalid(): boolean {
